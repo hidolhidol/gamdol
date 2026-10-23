@@ -138,6 +138,7 @@ kbd{font-family:var(--body);font-weight:800;color:var(--ink);background:#0a1430;
 .tb.atk{right:calc(27vmin + env(safe-area-inset-right,0px));bottom:calc(3vmin + env(safe-area-inset-bottom,0px))}
 .tb.talk{right:calc(8vmin + env(safe-area-inset-right,0px));bottom:calc(32vmin + env(safe-area-inset-bottom,0px));font-size:5vmin}
 .tb.pz{left:50%;transform:translateX(-50%);bottom:calc(3vmin + env(safe-area-inset-bottom,0px));width:11vmin;height:11vmin;font-size:4vmin}
+html,body{touch-action:none;-webkit-text-size-adjust:100%}
 body.touch{-webkit-touch-callout:none}
 body.touch #keys,body.touch .thelp{display:none}
 #rotate{display:none;position:fixed;left:16px;right:16px;top:calc(56.25vw + 30px);text-align:center;font-family:var(--ui);font-size:4.4vw;color:var(--muted);pointer-events:none}
@@ -968,6 +969,11 @@ function enableTouch() {
 }
 if (matchMedia('(pointer:coarse)').matches) setTimeout(enableTouch, 0);
 addEventListener('touchstart', enableTouch, { once: true, passive: true });
+/* block iOS double-tap and pinch zoom */
+let lastTouchEnd = 0;
+document.addEventListener('touchend', e => { const now = Date.now(); if (now - lastTouchEnd < 350) e.preventDefault(); lastTouchEnd = now; }, { passive: false });
+for (const ev of ['gesturestart', 'gesturechange', 'gestureend']) document.addEventListener(ev, e => e.preventDefault(), { passive: false });
+document.addEventListener('dblclick', e => e.preventDefault(), { passive: false });
 
 /* ---------- update ---------- */
 function update(dt) {
