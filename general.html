@@ -289,7 +289,7 @@ function buildHQ() {
   m.ladders = []; m.hazards = []; m.mobs = []; m.drops = []; m.items = []; m.sections = [];
   m.npcs = [{ id: 'general', name: '나대장', img: 'general', x: 610, y: GROUND, h: 80 }];
   m.portals = [
-    { x: 188, y: GROUND, to: 'top', tx: 120, ty: 2460, style: 'door', label: '사무실 맨 윗층', active: () => Q.state >= 4, lockMsg: '문이 잠겨 있다... 나대장님한테 먼저 가보자' },
+    { x: 188, y: GROUND, to: 'top', tx: 840, ty: 2460, style: 'door', label: '사무실 맨 윗층', active: () => Q.state >= 4, lockMsg: '문이 잠겨 있다... 나대장님한테 먼저 가보자' },
     { x: 1088, y: GROUND, to: 'supply', tx: 250, ty: GROUND, style: 'door', label: '제3보급소', active: () => true }
   ];
   m.spawn = { x: 330, y: GROUND };
@@ -354,6 +354,21 @@ function buildTop() {
     { y: 2420, n: '1구간 · 뿅뿅뿅', s: 2 }, { y: 1572, n: '2구간 · 찌릿찌릿 전선', s: 3 }, { y: 1002, n: '3구간 · 마지막 도장', s: 4 }
   ];
   m.spawn = { x: 120, y: 2460 };
+  return mirrorMap(m);
+}
+function mirrorMap(m) {
+  const W = m.w;
+  for (const pl of m.plats) { if (pl.kind === 'ground') continue; pl.x = W - pl.x - pl.w; if (pl.move) { pl.move.a = W - pl.move.a - pl.w; pl.move.b = W - pl.move.b - pl.w; } }
+  for (const l of m.ladders) l.x = W - l.x;
+  for (const h of m.hazards) {
+    if (h.x1 != null) { const a = W - h.x2, b = W - h.x1; h.x1 = a; h.x2 = b; }
+    if (h.x != null) h.x = W - h.x;
+    if (h.ax != null) h.ax = W - h.ax;
+    if (h.a != null) { h.a = W - h.a; h.b = W - h.b; }
+  }
+  for (const p of m.portals) p.x = W - p.x;
+  for (const it of m.items) it.x = W - it.x;
+  m.spawn.x = W - m.spawn.x;
   return m;
 }
 function resetWorld() {
@@ -958,10 +973,13 @@ function drawPlat(pl) {
     return;
   }
   if (pl.kind === 'pad') {
-    ctx.fillStyle = 'rgba(155,194,60,.18)'; ctx.fillRect(x + 4, y + 12, w - 8, 8);
-    ctx.fillStyle = '#4c5a3a'; rr(ctx, x, y, w, 12, 3); ctx.fill();
-    ctx.fillStyle = '#9fb27a'; ctx.fillRect(x + 2, y, w - 4, 3);
-    ctx.fillStyle = '#c8ff6a'; ctx.fillRect(x + w / 2 - 6, y + 5, 12, 3);
+    const gl = ctx.createRadialGradient(x + w / 2, y + 6, 2, x + w / 2, y + 6, 40); gl.addColorStop(0, 'rgba(210,255,140,.45)'); gl.addColorStop(1, 'rgba(210,255,140,0)');
+    ctx.fillStyle = gl; ctx.fillRect(x - 20, y - 30, w + 40, 60);
+    ctx.fillStyle = '#2c3a14'; rr(ctx, x - 1, y - 1, w + 2, 14, 4); ctx.fill();
+    ctx.fillStyle = '#b8e05a'; rr(ctx, x, y, w, 12, 3); ctx.fill();
+    ctx.fillStyle = '#f2ffc8'; ctx.fillRect(x + 2, y + 1, w - 4, 3);
+    ctx.fillStyle = '#6f9a20'; ctx.fillRect(x + 2, y + 9, w - 4, 2);
+    ctx.fillStyle = '#ffffff'; ctx.fillRect(x + w / 2 - 6, y + 5, 12, 2);
     return;
   }
   if (pl.kind === 'ground') {
