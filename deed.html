@@ -310,7 +310,7 @@ function buildTown() {
   const m = { id: 'town', name: '앙성마을', w: 1253, h: 700, t: 0, bg: { img: 'bg_town', fill: '#529edf', fill2: '#3f4148', oy: 124 } };
   m.plats = [plat(0, 1253, GROUND, { kind: 'ground', hidden: true })];
   m.ladders = []; m.hazards = []; m.mobs = []; m.drops = []; m.items = []; m.sections = [];
-  m.npcs = [{ id: 'rila', name: '곽릴라', img: 'rila', x: 1100, y: GROUND, h: 80 }];
+  m.npcs = [{ id: 'rila', name: '곽릴라', img: 'rila', x: 812, y: GROUND, h: 80 }];
   m.portals = [
     { x: 330, y: GROUND, to: 'top', tx: 840, ty: 2460, style: 'door', label: '앙성마을 꼭대기', active: () => Q.state >= 4, lockMsg: '꼭대기로 가는 길... 아직 갈 일이 없다' },
     { x: 1210, y: GROUND, to: 'village', tx: 140, ty: GROUND, style: 'swirl', label: '옆 마을', active: () => true }
@@ -357,7 +357,7 @@ function buildTop() {
   m.npcs = []; m.mobs = []; m.drops = [];
   m.portals = [
     { x: 60, y: 2460, to: 'town', tx: 330, ty: GROUND, style: 'swirl', label: '마을로 내려가기', active: () => true },
-    { x: 765, y: 300, to: 'town', tx: 1030, ty: GROUND, style: 'swirl', label: '릴라에게', active: () => Q.state >= 5, ret: true }
+    { x: 765, y: 300, to: 'town', tx: 740, ty: GROUND, style: 'swirl', label: '릴라에게', active: () => Q.state >= 5, ret: true }
   ];
   m.items = [{ id: 'tape', x: 650, y: 272, taken: false }];
   m.sections = [
@@ -735,16 +735,16 @@ function talk(n) {
       R('다발이는 근처에 있는데..ㅠㅠ 직접 받아오실래요?'),
       R('저는 지금..바빠서요..'),
       { who: 'hero', text: '네..어쩔 수 없죠.', choice: [
-        { label: '도와줄게요', go: go('고마워요. 옆 마을로 가면 다발이를 찾을 수 있을 거예요.') },
-        { label: '다른 데 알아보세요', go: go('아..효율 떨어지니깐 빨리 가세요') }
+        { label: '해야죠ㅠ', go: go('고마워요. 옆 마을로 가면 다발이를 찾을 수 있을 거예요.') },
+        { label: '아니 제가하라구요?', go: go('효율 떨어질텐데... 그럼 기다리시던지요..') }
       ] }
     ]);
     else if (Q.state <= 2) runDialog([R('옆 마을은 오른쪽이에요. 효율적으로 다녀오세요')]);
     else if (Q.state === 3) runDialog([
       H('저기...........땅문서 조각을 가져왔어요'),
       R('네? 아 화난다 잠깐만.......정말 중요한 문서인데'),
-      H('그거 제 땅문서인데요...'),
-      R('잠깐만, 효율 떨어지니깐'),
+      H('ㅠㅠ제 꺼잖아요...'),
+      R('잠깐만, 효율 떨어지니깐 쉿'),
       R('앙성마을 꼭대기에 종이를 마법처럼 붙여준다는 감쪽테이프를 놔뒀는데..'),
       H('설마..'),
       R('가져다줄래요?'),
@@ -761,10 +761,10 @@ function talk(n) {
     return;
   }
   if (n.id === 'dabal') {
-    if (Q.state === 0) runDialog([D('어디갔지 어디갔지 ㅜㅜㅜㅜ')]);
+    if (Q.state === 0) runDialog([D('비상 비상 ㅠㅠ 어디갔지 ㅜㅜㅜㅜ')]);
     else if (Q.state === 1) runDialog([
       H('저기..다발이?'),
-      D('나 큰일났어ㅜㅜ 나 죽었어ㅜㅜ'),
+      D('나 큰일났어ㅜㅜ 비상이야 나 죽었어ㅜㅜ'),
       H('무슨 일이야'),
       D('아니ㅜㅜㅜ 릴라 선생님이 복사해 오라고 한 땅문서를 루팡한테 뺏겼어 ㅠㅠㅠㅠ'),
       H('...그거 내 땅문서야.'),
@@ -1239,12 +1239,23 @@ function drawBG() {
   const im = IMG[b.img]; if (im.complete && im.naturalWidth) { const iy = -cam.y + (b.oy || 0); ctx.drawImage(im, -cam.x, iy); if (b.fill2) { ctx.fillStyle = b.fill2; ctx.fillRect(0, iy + im.naturalHeight - 1, VW, VH); } }
 }
 function drawShopSign() {
-  const x = 1150 - cam.x, y = 300 - cam.y;
-  ctx.fillStyle = '#1d2d52'; rr(ctx, x - 70, y, 140, 30, 6); ctx.fill();
-  ctx.strokeStyle = '#ffd25a'; ctx.lineWidth = 2.5; rr(ctx, x - 70, y, 140, 30, 6); ctx.stroke();
-  ctx.fillStyle = '#ffd25a'; ctx.font = '17px Jua, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('곽릴라 부동산', x, y + 16);
-  ctx.fillStyle = '#ffffff'; ctx.font = '10px Jua, sans-serif'; ctx.fillText('매매 · 전세 · 땅문서', x, y + 40);
+  const cx = 958 - cam.x, gy = GROUND - cam.y;
+  if (cx < -80 || cx > VW + 80) return;
+  // A-frame sandwich board
+  ctx.fillStyle = 'rgba(0,0,0,.3)'; ctx.beginPath(); ctx.ellipse(cx, gy, 40, 5, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = '#5a3a1e'; ctx.lineWidth = 4;
+  ctx.beginPath(); ctx.moveTo(cx - 30, gy); ctx.lineTo(cx - 22, gy - 96); ctx.moveTo(cx + 30, gy); ctx.lineTo(cx + 22, gy - 96); ctx.stroke();
+  ctx.fillStyle = '#2b2118'; rr(ctx, cx - 36, gy - 104, 72, 80, 5); ctx.fill();
+  ctx.fillStyle = '#1f3b2c'; rr(ctx, cx - 32, gy - 100, 64, 72, 3); ctx.fill();
+  ctx.fillStyle = '#ffd25a'; ctx.font = '12px Jua, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('곽릴라', cx, gy - 88); ctx.fillText('부동산', cx, gy - 74);
+  ctx.fillStyle = '#e9f3e2'; ctx.font = '9px Jua, sans-serif';
+  ctx.fillText('매매 · 전세', cx, gy - 59); ctx.fillText('땅문서 상담', cx, gy - 48);
+  ctx.fillStyle = '#ff9a7a'; ctx.fillText('★ 효율 100% ★', cx, gy - 36);
+  // little house icon
+  ctx.fillStyle = '#ffd25a'; ctx.beginPath(); ctx.moveTo(cx - 6, gy - 110); ctx.lineTo(cx, gy - 117); ctx.lineTo(cx + 6, gy - 110); ctx.fill();
 }
+
 function render() {
   ctx.setTransform(scale, 0, 0, scale, 0, 0);
   ctx.imageSmoothingEnabled = true;
